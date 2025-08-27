@@ -28,10 +28,10 @@ import {
 import { useLiveQuery, eq } from '@tanstack/react-db';
 
 // Separate toolbar component to access runtime context
-const ChatToolbar = ({ 
-  onOpenSidebar, 
-  onOpenToolSelector 
-}: { 
+const ChatToolbar = ({
+  onOpenSidebar,
+  onOpenToolSelector,
+}: {
   onOpenSidebar: () => void;
   onOpenToolSelector: () => void;
 }) => {
@@ -51,12 +51,7 @@ const ChatToolbar = ({
     <div className="toolbar-surface">
       <div className="toolbar-inner">
         <div className="toolbar-group">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="btn-toolbar-primary"
-            onClick={onOpenSidebar}
-          >
+          <Button variant="ghost" size="sm" className="btn-toolbar-primary" onClick={onOpenSidebar}>
             <MenuIcon className="h-4 w-4" />
             <span className="text-xs font-medium">Threads</span>
           </Button>
@@ -171,7 +166,7 @@ const Chat = () => {
             <div className="flex-1 min-h-0">
               <Thread />
             </div>
-            <ChatToolbar 
+            <ChatToolbar
               onOpenSidebar={() => setIsSidebarOpen(true)}
               onOpenToolSelector={() => setIsToolSelectorOpen(true)}
             />
