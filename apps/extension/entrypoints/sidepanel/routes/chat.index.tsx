@@ -1,8 +1,9 @@
 import { Thread } from '@/entrypoints/sidepanel/components/assistant-ui/thread';
 import { ThreadList } from '@/entrypoints/sidepanel/components/assistant-ui/thread-list';
+import { TooltipIconButton } from '@/entrypoints/sidepanel/components/assistant-ui/tooltip-icon-button';
 import { ToolSelector } from '@/entrypoints/sidepanel/components/tool-selector';
 import { Button } from '@/entrypoints/sidepanel/components/ui/button';
-import { AssistantRuntimeProvider } from '@assistant-ui/react';
+import { AssistantRuntimeProvider, useAssistantRuntime } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai';
 import { McpClientProvider } from '@mcp-b/mcp-react-hooks';
@@ -12,6 +13,7 @@ import {
   ChevronRightIcon,
   HelpCircleIcon,
   MenuIcon,
+  PlusIcon,
   Settings2Icon,
 } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
@@ -25,10 +27,83 @@ import {
 } from '../lib/modelConfig';
 import { useLiveQuery, eq } from '@tanstack/react-db';
 
+// Separate toolbar component to access runtime context
+const ChatToolbar = ({
+  onOpenSidebar,
+  onOpenToolSelector,
+}: {
+  onOpenSidebar: () => void;
+  onOpenToolSelector: () => void;
+}) => {
+  const navigate = useNavigate();
+  const runtime = useAssistantRuntime();
+
+  const handleNewThread = () => {
+    // Use the threadList API if available, otherwise fallback to runtime method
+    if (runtime.threadList) {
+      runtime.threadList.switchToNewThread();
+    } else if (runtime.switchToNewThread) {
+      runtime.switchToNewThread();
+    }
+  };
+
+  return (
+    <div className="toolbar-surface">
+      <div className="toolbar-inner">
+        <div className="toolbar-group">
+          <Button variant="ghost" size="sm" className="btn-toolbar-primary" onClick={onOpenSidebar}>
+            <MenuIcon className="h-4 w-4" />
+            <span className="text-xs font-medium">Threads</span>
+          </Button>
+
+          <div className="w-px h-6 bg-border/50 mx-1" />
+
+          <TooltipIconButton
+            tooltip="New Thread"
+            variant="ghost"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors"
+            onClick={handleNewThread}
+          >
+            <PlusIcon className="h-4 w-4" />
+          </TooltipIconButton>
+
+          <TooltipIconButton
+            tooltip="Select Tools"
+            variant="ghost"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors"
+            onClick={onOpenToolSelector}
+          >
+            <BrainCircuitIcon className="h-4 w-4" />
+          </TooltipIconButton>
+
+          <TooltipIconButton
+            tooltip="Settings"
+            variant="ghost"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors"
+            onClick={() => navigate({ to: '/settings' })}
+          >
+            <Settings2Icon className="h-4 w-4" />
+          </TooltipIconButton>
+        </div>
+
+        <div className="toolbar-group">
+          <TooltipIconButton
+            tooltip="Help (Coming Soon)"
+            variant="ghost"
+            className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors"
+            disabled
+          >
+            <HelpCircleIcon className="h-4 w-4 text-muted-foreground" />
+          </TooltipIconButton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Chat = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isToolSelectorOpen, setIsToolSelectorOpen] = useState(false);
-  const navigate = useNavigate();
 
   const lqConfig = useLiveQuery((q) =>
     q
@@ -91,56 +166,10 @@ const Chat = () => {
             <div className="flex-1 min-h-0">
               <Thread />
             </div>
-            {/* Enhanced Toolbar */}
-            <div className="toolbar-surface">
-              <div className="toolbar-inner">
-                <div className="toolbar-group">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="btn-toolbar-primary"
-                    onClick={() => setIsSidebarOpen(true)}
-                  >
-                    <MenuIcon className="h-4 w-4" />
-                    <span className="text-xs font-medium">Threads</span>
-                  </Button>
-
-                  <div className="w-px h-6 bg-border/50 mx-1" />
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="btn-toolbar-icon-primary"
-                    onClick={() => setIsToolSelectorOpen(true)}
-                    title="Select Tools"
-                  >
-                    <BrainCircuitIcon className="h-4 w-4" />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-9 w-9 p-0 hover:bg-primary/10 transition-colors"
-                    title="Settings"
-                    onClick={() => navigate({ to: '/settings' })}
-                  >
-                    <Settings2Icon className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="toolbar-group">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="btn-toolbar-icon-secondary"
-                    disabled
-                    title="Help (Coming Soon)"
-                  >
-                    <HelpCircleIcon className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ChatToolbar
+              onOpenSidebar={() => setIsSidebarOpen(true)}
+              onOpenToolSelector={() => setIsToolSelectorOpen(true)}
+            />
           </div>
         )}
       </AssistantRuntimeProvider>
