@@ -1,5 +1,9 @@
 > [!IMPORTANT]
-> 🚨 Important Update: Please download version [1.0.0](https://www.npmjs.com/package/@mcp-b/transports/v/1.0.0?activeTab=readme) from NPM as this is a breaking change! 🚨
+> 🚨 The WebMCP API has been accepted as a W3C deliverable and is transitioning to official web standard development. The community and all related work has moved to the [WebMCP explainer repository](https://github.com/webmachinelearning/webmcp). Please join us there! 🚨
+
+> [!IMPORTANT]
+> 📝 Repository Status: The MCP-B extension is no longer open source. This repository represents an older version of the codebase and is maintained for historical reference only. All open source content (transports, etc.) have been ported to the [WebMCP Github Org](https://github.com/WebMCP-org).
+
 
 
 # WebMCP:
